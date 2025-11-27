@@ -8,6 +8,7 @@ function close_input_table() {
 
 function delete_data(value) {
     // 發送 DELETE 請求到後端
+    if (!confirm("確定要刪除這筆資料嗎？")) return;
     fetch(`/product?order_id=${value}`, {
         method: "DELETE",
     })
@@ -24,5 +25,90 @@ function delete_data(value) {
     })
     .catch(error => {
         console.error("發生錯誤：", error);
+    });
+}
+
+// 初始化表單欄位
+function initForm() {
+    document.getElementById("date").valueAsDate = new Date();
+    document.getElementById("quantity").value = 1;
+    document.getElementById("status").value = "未付款";
+    document.getElementById("total").textContent = "小計：0 元";
+}
+
+// 1. 選取商品種類後的連動邏輯 (Fetch API)
+function selectCategory() {
+    const category = document.getElementById("category").value;
+    fetch(`/api/products?category=${encodeURIComponent(category)}`)
+        .then(res => res.json())
+        .then(data => {
+            const productSelect = document.getElementById("product");
+            productSelect.innerHTML = "";
+            data.forEach(item => {
+                const option = document.createElement("option");
+                option.value = item.name;
+                option.textContent = item.name;
+                productSelect.appendChild(option);
+            });
+            selectProduct(); // 預設選第一個商品並更新價格
+        })
+        .catch(err => console.error("商品列表取得失敗：", err));
+}
+
+// 2. 選取商品後的價格更新邏輯 (Fetch API)
+function selectProduct() {
+    const productName = document.getElementById("product").value;
+    fetch(`/api/price?name=${encodeURIComponent(productName)}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("price").value = data.price;
+            countTotal();
+        })
+        .catch(err => console.error("價格取得失敗：", err));
+}
+
+// 3. 計算小計邏輯
+function countTotal() {
+    const price = parseFloat(document.getElementById("price").value) || 0;
+    const quantity = parseInt(document.getElementById("quantity").value) || 1;
+    const total = price * quantity;
+    document.getElementById("total").textContent = `小計：${total.toFixed(2)} 元`;
+}
+
+// 4. 表單送出邏輯
+function submitForm() {
+    const payload = {
+        customer: document.getElementById("customer").value,
+        note: document.getElementById("note").value,
+        date: document.getElementById("date").value,
+        quantity: parseInt(document.getElementById("quantity").value),
+        status: document.getElementById("status").value,
+        category: document.getElementById("category").value,
+        product: document.getElementById("product").value,
+        price: parseFloat(document.getElementById("price").value)
+    };
+
+    if (!payload.customer || !payload.product || payload.quantity <= 0) {
+        alert("請填寫完整資料，且數量需大於 0");
+        return;
+    }
+
+    fetch("/product", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("新增失敗");
+        return res.json();
+    })
+    .then(result => {
+        alert("新增成功！");
+        close_input_table();
+        location.assign('/');
+    })
+    .catch(err => {
+        console.error("送出失敗：", err);
+        alert("送出失敗，請稍後再試");
     });
 }
