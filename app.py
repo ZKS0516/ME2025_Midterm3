@@ -32,26 +32,18 @@ def product():
             return jsonify({"error": "Missing parameters"}), 400
 
     elif request.method == 'POST':
-        # 同時支援 JSON 與 form-data
-        if request.is_json:
-            data = request.get_json()
-        else:
-            data = request.form.to_dict()
-
-        try:
-            order_data = {
-                "product_date": data.get("date"),
-                "customer_name": data.get("customer"),
-                "product_name": data.get("product"),
-                "product_amount": int(data.get("quantity")),
-                "product_total": float(data.get("price")) * int(data.get("quantity")),
-                "product_status": data.get("status"),
-                "product_note": data.get("note")
-            }
-            db.add_order(order_data)
-            return jsonify({"message": "Order placed successfully"}), 200
-        except Exception as e:
-            return jsonify({"error": str(e)}), 400
+        data = request.get_json()  # 前端送來的 JSON
+        order_data = {
+            "product_date": data.get("date"),
+            "customer_name": data.get("customer"),
+            "product_name": data.get("product"),
+            "product_amount": int(data.get("quantity")),
+            "product_total": float(data.get("price")) * int(data.get("quantity")),
+            "product_status": data.get("status"),
+            "product_note": data.get("note")
+        }
+        db.add_order(order_data)
+        return jsonify({"message": "Order placed successfully"}), 200
 
     elif request.method == 'DELETE':
         order_id = request.args.get("order_id")

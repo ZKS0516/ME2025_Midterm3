@@ -20,9 +20,9 @@ class Database():
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
         cur.execute("SELECT product FROM commodity WHERE category = ?", (category,))
-        rows = cur.fetchall()
+        result = [row[0] for row in cur.fetchall()]
         conn.close()
-        return [row[0] for row in rows]  # 保留完整字串
+        return result
 
     # 2. 根據 product 名稱查詢單價
     def get_product_price(self, product):
@@ -72,9 +72,7 @@ class Database():
     # 5. 刪除訂單
     def delete_order(self, order_id):
         conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM orders WHERE id=?", (order_id,))
+        cur = conn.cursor()
+        cur.execute("DELETE FROM order_list WHERE order_id = ?", (order_id,))
         conn.commit()
-        success = cursor.rowcount > 0
         conn.close()
-        return success
