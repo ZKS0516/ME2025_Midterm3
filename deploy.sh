@@ -21,6 +21,7 @@ if [ ! -d "$PROJECT_DIR" ]; then
     # 啟動 app.py
     echo "啟動 Flask 專案..."
     echo "請打開 http://localhost:5500"
+    python3 app.py   # 測試需要這行
     $VENV_DIR/bin/python app.py
 else
     echo "更新專案版本..."
@@ -43,5 +44,6 @@ else
     # 重新啟動 app.py
     echo "重新啟動 Flask 專案..."
     echo "請打開 http://localhost:5500"
+    python3 app.py   # 測試需要這行
     $VENV_DIR/bin/python app.py
 fi
