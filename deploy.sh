@@ -20,7 +20,8 @@ if [ ! -d "$PROJECT_DIR" ]; then
 
     # 啟動 app.py
     echo "啟動 Flask 專案..."
-    nohup $VENV_DIR/bin/python app.py > app.log 2>&1 &
+    echo "請打開 http://localhost:5500"
+    $VENV_DIR/bin/python app.py
 else
     echo "更新專案版本..."
     cd $PROJECT_DIR
