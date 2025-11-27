@@ -39,15 +39,15 @@ function initForm() {
 // 1. 選取商品種類後的連動邏輯 (Fetch API)
 function selectCategory() {
     const category = document.getElementById("category").value;
-    fetch(`/api/products?category=${encodeURIComponent(category)}`)
+    fetch(`/product?category=${encodeURIComponent(category)}`)
         .then(res => res.json())
         .then(data => {
             const productSelect = document.getElementById("product");
             productSelect.innerHTML = "";
-            data.forEach(item => {
+            data.product.forEach(name => {
                 const option = document.createElement("option");
-                option.value = item.name;
-                option.textContent = item.name;
+                option.value = name;
+                option.textContent = name;
                 productSelect.appendChild(option);
             });
             selectProduct(); // 預設選第一個商品並更新價格
@@ -58,7 +58,7 @@ function selectCategory() {
 // 2. 選取商品後的價格更新邏輯 (Fetch API)
 function selectProduct() {
     const productName = document.getElementById("product").value;
-    fetch(`/api/price?name=${encodeURIComponent(productName)}`)
+    fetch(`/product?product=${encodeURIComponent(productName)}`)
         .then(res => res.json())
         .then(data => {
             document.getElementById("price").value = data.price;
@@ -76,7 +76,11 @@ function countTotal() {
 }
 
 // 4. 表單送出邏輯
+let submitting = false; // 全域旗標，防止重複送出
 function submitForm() {
+    if (submitting) return; // 如果正在送出，就跳過
+    submitting = true;      // 鎖住送出
+
     const payload = {
         customer: document.getElementById("customer").value,
         note: document.getElementById("note").value,
@@ -110,5 +114,8 @@ function submitForm() {
     .catch(err => {
         console.error("送出失敗：", err);
         alert("送出失敗，請稍後再試");
+    })
+    .finally(() => {
+        submitting = false; // 無論成功或失敗都要解鎖
     });
 }

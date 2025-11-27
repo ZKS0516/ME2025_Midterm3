@@ -39,17 +39,17 @@ class Database():
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO order_list 
-            (order_id, product_date, customer_name, product_name, product_amount, product_total, product_status, product_note)
+            (order_id, date, customer_name, product, amount, total, status, note)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             self.generate_order_id(),
-            order_data["product_date"],
+            order_data["product_date"],      # 對應到資料表的 date 欄位
             order_data["customer_name"],
-            order_data["product_name"],
-            order_data["product_amount"],
-            order_data["product_total"],
-            order_data["product_status"],
-            order_data["product_note"]
+            order_data["product_name"],      # 對應到 product
+            order_data["product_amount"],    # 對應到 amount
+            order_data["product_total"],     # 對應到 total
+            order_data["product_status"],    # 對應到 status
+            order_data["product_note"]       # 對應到 note
         ))
         conn.commit()
         conn.close()
@@ -59,10 +59,10 @@ class Database():
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
         cur.execute("""
-            SELECT o.order_id, o.product_date, o.customer_name, o.product_name,
-                   c.price, o.product_amount, o.product_total, o.product_status, o.product_note
+            SELECT o.order_id, o.date, o.customer_name, o.product,
+                   c.price, o.amount, o.total, o.status, o.note
             FROM order_list o
-            LEFT JOIN commodity c ON o.product_name = c.product
+            LEFT JOIN commodity c ON o.product = c.product
             ORDER BY o.order_id ASC
         """)
         result = cur.fetchall()

@@ -43,7 +43,7 @@ def product():
             "product_note": data.get("note")
         }
         db.add_order(order_data)
-        return redirect(url_for("index", warning="Order placed successfully"))
+        return jsonify({"message": "Order placed successfully"}), 200
 
     elif request.method == 'DELETE':
         order_id = request.args.get("order_id")
